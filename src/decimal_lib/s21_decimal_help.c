@@ -133,7 +133,6 @@ int s21_pow_ballance(s21_decimal *a, s21_decimal *b) {
     if (bn != an) {
         while (an != bn) {
             s21_bank_round(a);
-            // s21_binary_div(*a, ten, a);
             an--;
         }
     }

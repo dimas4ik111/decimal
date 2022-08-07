@@ -69,23 +69,25 @@ int s21_from_float_to_decimal(float f, s21_decimal *dst) {
         lf *= 10;
     }
     lf = round(lf);
-    if (lf < 9223372036854775807LL) {
-        unsigned long long help_var = (unsigned long long)lf;
-        int j = 0;
-        while (help_var > 0) {
-            if (help_var % 2 == 0) {
-                s21_set_bit(dst, j, 0);
-            } else {
-                s21_set_bit(dst, j, 1);
-            }
-            j++;
-            help_var /= 2;
+
+    double part_del;
+    int j = 0;
+    while (lf >= 1) {
+        part_del = lf / 2;
+        double i;
+        double f;
+        f = modf(part_del, &i);
+        if (f == 0.0) {
+            s21_set_bit(dst, j, 0);
+        } else {
+            s21_set_bit(dst, j, 1);
         }
-        s21_set_bit(dst, 127, sing);
-        s21_set_exp(dst, exp);
-    } else {
-        
+        lf /= 2;
+        lf -= f;
+        j++;
     }
+    s21_set_bit(dst, 127, sing);
+    s21_set_exp(dst, exp);
     return 0;
 }
 
