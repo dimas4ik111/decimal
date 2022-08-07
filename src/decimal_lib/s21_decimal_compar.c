@@ -27,30 +27,26 @@ int s21_is_greater(s21_decimal dec_first, s21_decimal dec_second) {
     } else if (exp1 < exp2) {
         s21_pow_ballance(&dec_second, &dec_first);
     }
-    if (singV1 > singV2) {
-            res = FALSE;
+    if (singV2 < singV1) {
+        res = 0;
     } else if (singV1 < singV2) {
-            res = TRUE;
+        res = 1;
     } else if (singV1 == singV2) {
-        if (dec_first.bits[2] > dec_second.bits[2]) {
-            res = TRUE;
-        } else if (dec_first.bits[2] < dec_second.bits[2]) {
-            res = FALSE;
-        } else {
-            if (dec_first.bits[1] > dec_second.bits[1]) {
-                res = TRUE;
-            } else if (dec_first.bits[1] < dec_second.bits[1]) {
-                res = FALSE;
-            } else {
-                if (dec_first.bits[0] > dec_second.bits[0]) {
-                    res = TRUE;
-                } else {
-                    res = FALSE;
-                }
+        int bits1 = 0;
+        int bits2 = 0;
+        for (int i = 95; i >= 0; i--) {
+            bits1 += s21_get_bit(&dec_first, i);
+            bits2 += s21_get_bit(&dec_second, i);
+            if (bits1 > bits2) {
+                res = 1;
+                i = -1;
+            } else if (bits1 < bits2) {
+                res = 0;
+                i = -1;
             }
         }
     }
-    if (s21_get_sing(&dec_first) + s21_get_sing(&dec_second) == 2) {
+    if (singV1 + singV2 == 2) {
         res = !res;
     }
     return res;

@@ -1,0 +1,85 @@
+int s21_from_float_to_decimal_help(float f, s21_decimal *dst) {
+    s21_decimal_null(dst);
+    if ((0 < f && f < 1e-28) || (f > 79228162514264337593543950335.0L))
+        return 1;
+    int sing = 0;
+    if (f < 0) {
+        sing = 1;
+        f = -f;
+    }
+    double lf = fabs(f);
+    double copy_lf = lf;
+    int counter = 0;
+    while (copy_lf > 1) {
+        copy_lf /= 10;
+        counter++;
+    }
+    int exp = 0;
+    for (int i = 0; i < 6; i++, counter++) {
+        if (fmod(lf, 10.0) == 0)
+            break;
+        if (counter == 28) {
+            break;
+        }
+        exp = i + 1;
+        lf *= 10;
+    }
+    lf = round(lf);
+    int res = 0;
+    if (f < 0) {
+        s21_sing_dec(dst);
+        f = -f;
+    }
+    int pow_ten = 0;
+    int n = 0;
+    if (dst != NULL && f >= -(pow(2, 96)) && f <= pow(2, 96)) {
+        if (f < 0 || f == -0.0F) {
+            s21_sing_dec(dst);
+            f = -f;
+        }
+        size_t size = sizeof(f);
+        unsigned char *p = (unsigned char *) &f;
+        p += size - 1;
+        while (size--) {
+            for (int i = 0; i < 8 ; i++) {
+                int help_var = (*p & 128 ? 1 : 0);
+                *p <<= 1;
+                s21_set_bit(dst, 31 - n, !!help_var);
+                n++;
+            }
+            p--;
+        }
+    }
+    int exp = 0;
+    for (int i = 23; i < 31; i++) {
+        exp += pow(2, (i - 23)) * s21_get_bit(dst, i);
+        s21_set_bit(dst, i, 0);
+    }
+    exp -= 127;
+
+    s21_set_bit(dst, 23, 1);
+    s21_decimal ten;
+    s21_from_int_to_decimal(10, &ten);
+    if (23 - exp < 0) {
+        for (int i = 0; i < exp - 23; i++) {
+            if (s21_get_bit(dst, 0)) {
+                s21_mul(*dst, ten, dst);
+                pow_ten++;
+            }
+            s21_Lshift(dst);
+            if (pow_ten > 28)
+                break;
+        }
+    }
+    for (int i = exp; i < 23; i++) {
+        if (s21_get_bit(dst, 0)) {
+            s21_mul(*dst, ten, dst);
+            pow_ten++;
+        }
+        s21_Rshift(dst);
+        if (pow_ten > 28)
+            break;
+    }
+    s21_set_exp(dst, pow_ten);
+    return res;
+}

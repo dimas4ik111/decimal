@@ -17,24 +17,38 @@
 // }
 // END_TEST
 
-// START_TEST(div_2048) {
-//     s21_decimal a;
-//     s21_decimal b;
-//     s21_decimal res;
-//     float rrr;
-//     for (float i = 312439.000000F; i < 9999999.999999F; i += 156212.5F) {
-//         for (float j = 2048.0F; j >= 1.0F; j -= 9.123F) {
-//             s21_from_float_to_decimal(i, &a);
-//             s21_from_float_to_decimal(j, &b);
-//             s21_div(a, b, &res);
-//             s21_from_decimal_to_float(res, &rrr);
-//             printf("my fun %f / %f = %.28f\n", i, j, rrr);
-//             printf("RESULT %f / %f = %.28f\n\n", i, j, i / j);
-//             ck_assert_float_eq(rrr, (float)i / (float)j);
-//         }
-//     }
-// }
-// END_TEST
+START_TEST(float_dec_2048) {
+    s21_decimal res;
+    float f;
+    char buf1[256] = {'\0'};
+    char buf2[256] = {'\0'};
+    for (float i = 114; i < 31111111.402823F; i += 1131231.1) {
+        int result = s21_from_float_to_decimal(i, &res);
+        if (result == 0) {
+            s21_from_decimal_to_float(res, &f);
+            sprintf(buf1, "%f", i);
+            sprintf(buf2, "%f", f);
+            // printf(" i = %f  ||  %s\n", i, buf1);
+            // printf(" f = %f  ||  %s\n", f, buf2);
+            // printf(" b = %u     %u %u\n\n", res.bits[0], res.bits[1], res.bits[2]);
+            ck_assert_str_eq(buf1, buf2);
+            ck_assert_float_eq(i, f);
+        }
+    }
+}
+END_TEST
+
+START_TEST(bank_r) {
+    s21_decimal a;
+    s21_decimal_null(&a);
+    for (int i = 0; i < 93; i++) {
+        s21_set_bit(&a, i, i % 3);
+    }
+    s21_set_exp(&a, 15);
+    s21_print_binary_decimal(a, 128);
+    s21_bank_round(&a);
+    s21_print_binary_decimal(a, 128);
+}
 
 // START_TEST(mod_2048) {
 //     s21_decimal a;
@@ -58,9 +72,10 @@ Suite* s21_test_help(void) {
     TCase *test_help;
 
     test_help = tcase_create("DEBUG AND HELP:\n");
-    // tcase_add_test(test_help, div_2048);
+    // tcase_add_test(test_help, float_dec_2048);
     // tcase_add_test(test_help, div_b_2048);
     // tcase_add_test(test_help, mod_2048);
+    // tcase_add_test(test_help, bank_r);
     suite_add_tcase(s, test_help);
     return s;
 }

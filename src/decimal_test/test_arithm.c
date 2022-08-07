@@ -115,11 +115,11 @@ START_TEST(s21_add8) {
     s21_decimal b;
     s21_decimal res;
     s21_from_int_to_decimal(123321, &a);
-    s21_from_int_to_decimal(10, &b);
+    s21_from_int_to_decimal(-10, &b);
     s21_add(a, b, &res);
     int rrr;
     s21_from_decimal_to_int(res, &rrr);
-    ck_assert_int_eq(rrr, 123321 + 10);
+    ck_assert_int_eq(rrr, 123321 - 10);
 }
 END_TEST
 
@@ -492,7 +492,7 @@ START_TEST(s21_div3) {
     int check = s21_div(a, b, &res);
     float f;
     s21_from_decimal_to_float(res, &f);
-    ck_assert_float_eq(f, 370412.0F / 37.0F);
+    ck_assert_float_eq(f, 370412.0 / 37.0);
     ck_assert_int_eq(check, 0);
 }
 END_TEST
@@ -580,12 +580,12 @@ START_TEST(s21_div10) {
     s21_decimal a;
     s21_decimal b;
     s21_decimal res;
-    s21_from_float_to_decimal(125123123123.99317F, &a);
-    s21_from_float_to_decimal(22123123123.888344521F, &b);
+    s21_from_float_to_decimal(1, &a);
+    s21_from_float_to_decimal(3, &b);
     s21_div(a, b, &res);
     float f;
     s21_from_decimal_to_float(res, &f);
-    ck_assert_float_eq(f, 125123123123.99317F / 22123123123.888344521F);
+    ck_assert_float_eq(f, 1.0 / 3.0);
 }
 END_TEST
 
@@ -632,12 +632,12 @@ START_TEST(s21_mod3) {
     s21_decimal a;
     s21_decimal b;
     s21_decimal res;
-    s21_from_float_to_decimal(12.5F, &a);
-    s21_from_float_to_decimal(2.2F, &b);
+    s21_from_float_to_decimal(12.5, &a);
+    s21_from_float_to_decimal(2.2, &b);
     s21_mod(a, b, &res);
     float f;
     s21_from_decimal_to_float(res, &f);
-    ck_assert_float_eq(f, fmodf(12.5F, 2.2F));
+    ck_assert_float_eq(f, fmod(12.5, 2.2));
 }
 END_TEST
 
@@ -654,72 +654,49 @@ START_TEST(s21_mod4) {
 }
 END_TEST
 
-// START_TEST(s21_multi_add) {
-//     s21_decimal a;
-//     s21_decimal b;
-//     s21_decimal res;
-//     float f;
-//     for (float i = 50.55F; i <= 200.0F; i += 50.0F) {
-//         for (float j = -99999.99999F; j <= 99999.99999F; j += 0.25F) {
-//             if (i == 0.0F || j == 0.0) {
-//                 i++; j++;
-//             }
-//             s21_from_float_to_decimal(i, &a);
-//             s21_from_float_to_decimal(j, &b);
-//             s21_add(a, b, &res);
-//             s21_from_decimal_to_float(res, &f);
-//             ck_assert_float_eq(f, i + j);
-//             ck_abort_msg("asfsafasdsa");
-//             printf("my fun %f + %f = %.28f\n", i, j, f);
-//             printf("RESULT %f + %f = %.28f\n\n", i, j, i + j);
-//         }
-//     }
-// }
-// END_TEST
+START_TEST(s21_multi_add) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    float f;
 
-// START_TEST(s21_multi_sub) {
-//     s21_decimal a;
-//     s21_decimal b;
-//     s21_decimal res;
-//     float f;
-//     for (float i = 50.55F; i <= 200.0F; i += 50.0F) {
-//         for (float j = -99999.99999F; j <= 99999.99999F; j += 0.25F) {
-//             if (i == 0.0F || j == 0.0) {
-//                 i++; j++;
-//             }
-//             s21_from_float_to_decimal(i, &a);
-//             s21_from_float_to_decimal(j, &b);
-//             s21_sub(a, b, &res);
-//             s21_from_decimal_to_float(res, &f);
-//             ck_assert_float_eq(f, i - j);
-//             printf("my fun %f - %f = %.28f\n", i, j, f);
-//             printf("RESULT %f - %f = %.28f\n\n", i, j, i - j);
-//         }
-//     }
-// }
-// END_TEST
+    for (float i = 50.3F; i <= 200.0F; i += 50.0F) {
+        for (float j = -1234.5F; j <= 1234.5F; j += 9.0F) {
+            if (i == 0.0F || j == 0.0F) {
+                i++; j++;
+            }
+            s21_from_float_to_decimal(i, &a);
+            s21_from_float_to_decimal(j, &b);
+            s21_add(a, b, &res);
+            s21_from_decimal_to_float(res, &f);
+            // printf("my fun %f + %f = %f\n", i, j, f);
+            // printf("RESULT %f + %f = %f\n", i, j, i + j);
+            // printf("%u %u %u\n\n", res.bits[0], res.bits[1], res.bits[2]);
+                ck_assert_float_eq(f, i + j);
+        }
+    }
+}
+END_TEST
 
-// START_TEST(s21_multi_mul) {
-//     s21_decimal a;
-//     s21_decimal b;
-//     s21_decimal res;
-//     float f;
-//     for (float i = 50.55F; i <= 200.0F; i += 50.0F) {
-//         for (float j = -99999.99999F; j <= 99999.99999F; j += 0.25F) {
-//             if (i == 0.0F || j == 0.0) {
-//                 i++; j++;
-//             }
-//             s21_from_float_to_decimal(i, &a);
-//             s21_from_float_to_decimal(j, &b);
-//             s21_mul(a, b, &res);
-//             s21_from_decimal_to_float(res, &f);
-//             ck_assert_float_eq(f, i * j);
-//             printf("my fun %f * %f = %.28f\n", i, j, f);
-//             printf("RESULT %f * %f = %.28f\n\n", i, j, i * j);
-//         }
-//     }
-// }
-// END_TEST
+START_TEST(s21_multi_mul) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    float f;
+    for (float i = 50.55; i <= 200.0; i += 50.0) {
+        for (float j = -99999.99999; j <= 99999.99999; j += 9999) {
+            if (i == 0.0F || j == 0.0) {
+                i++; j++;
+            }
+            s21_from_float_to_decimal(i, &a);
+            s21_from_float_to_decimal(j, &b);
+            s21_mul(a, b, &res);
+            s21_from_decimal_to_float(res, &f);
+            ck_assert_float_eq(f, i * j);
+        }
+    }
+}
+END_TEST
 
 // START_TEST(s21_multi_div) {
 //     s21_decimal a;
@@ -736,7 +713,7 @@ END_TEST
 //             s21_div(a, b, &res);
 //             s21_from_decimal_to_float(res, &f);
 //             printf("my fun %f / %f = %.28f\n", i, j, f);
-//             printf("RESULT %f / %f = %.28f\n\n", i, j, i * j);
+//             printf("RESULT %f / %f = %.28f\n\n", i, j, i / j);
 //             ck_assert_float_eq(f, i / j);
 //         }
 //     }
@@ -808,12 +785,11 @@ Suite* s21_test_arithm(void) {
     tcase_add_test(arithm_a_test, s21_mod4);
     suite_add_tcase(s, arithm_a_test);
 
-    // arithm_a_test = tcase_create("--MULTI_TEST__");
-    // tcase_add_test(arithm_a_test, s21_multi_add);
-    // tcase_add_test(arithm_a_test, s21_multi_sub);
-    // tcase_add_test(arithm_a_test, s21_multi_mul);
+    arithm_a_test = tcase_create("--MULTI_TEST__");
+    tcase_add_test(arithm_a_test, s21_multi_add);
+    tcase_add_test(arithm_a_test, s21_multi_mul);
     // tcase_add_test(arithm_a_test, s21_multi_div);
-    // suite_add_tcase(s, arithm_a_test);
+    suite_add_tcase(s, arithm_a_test);
 
     return s;
 }

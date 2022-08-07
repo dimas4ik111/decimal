@@ -12,22 +12,16 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     } else if (exp1 < exp2) {
         s21_set_exp(result, s21_pow_ballance(&value_2, &value_1));
     }
-
     if (singV1 < singV2) {
         s21_set_bit(&value_2, 127, 0);
         res = s21_sub(value_1, value_2, result);
-    } else if (singV1 + singV2 == 2) {
+    } else if (singV1 == singV2) {
         res = s21_binary_add(value_1, value_2, result);
-        s21_sing_dec(result);
+        if (singV1 + singV2 == 2)
+            s21_sing_dec(result);
     } else if (singV1 > singV2) {
         s21_set_bit(&value_1, 127, 0);
         res = s21_sub(value_2, value_1, result);
-    } else if (singV1 + singV2 == 0) {
-        res = s21_binary_add(value_1, value_2, result);
-    }
-
-    if (exp1 == exp2) {
-        s21_set_exp(result, exp1);
     }
     return res;
 }
@@ -71,15 +65,40 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     s21_decimal_null(result);
-    int res = 0, singV1 = s21_get_sing(&value_1), singV2 = s21_get_sing(&value_2);
-    int exp1 = s21_get_exp_dec(&value_1);
-    int exp2 = s21_get_exp_dec(&value_2);
-
+    int res = 1, singV1 = s21_get_sing(&value_1), singV2 = s21_get_sing(&value_2);
+    int exp1 = 0;
+    int exp2 = 0;
+    exp1 = s21_get_exp_dec(&value_1);
+    exp2 = s21_get_exp_dec(&value_2);
     res = s21_binary_mul(value_1, value_2, result);
+    while (res) {
+        if (exp1 > exp2) {
+            s21_bank_round(&value_1);
+            res = s21_binary_mul(value_1, value_2, result);
+            exp1--;
+        } else if (exp2 > exp1) {
+            s21_bank_round(&value_2);
+            res = s21_binary_mul(value_1, value_2, result);
+            exp2--;
+        } else if (exp1 == exp2 && exp1 > 0) {
+            s21_bank_round(&value_1);
+            s21_bank_round(&value_2);
+            res = s21_binary_mul(value_1, value_2, result);
+            exp1--;
+            exp2--;
+        } else if (exp1 + exp2 == 0) {
+            break;
+        }
+    }
+
+
     if ((singV1 == 1 && singV2 == 0) || (singV1 == 0 && singV2 == 1)) {
         s21_sing_dec(result);
     }
     s21_set_exp(result, exp1 + exp2);
+    if (res) {
+        s21_decimal_null(result);
+    }
     return res;
 }
 
@@ -105,7 +124,6 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 
     value_1.bits[3] = 0;
     value_2.bits[3] = 0;
-
     if (!s21_is_equal(value_1, nuller)) {
         res = s21_binary_div(value_1, value_2, result);
         s21_decimal res_mod;
@@ -116,29 +134,27 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
             s21_from_int_to_decimal(10, &ten);
             s21_mul(res_mod, ten, &res_mod);
             partial_res = res_mod;
-
+            int counter = 0;
             while (s21_is_not_equal(res_mod, nuller)) {
                 s21_decimal copy_res = *result;
-
+            
                 if (s21_get_exp_dec(result) == 28 || s21_mul(copy_res, ten, &copy_res) > 0) {
                     break;
                 }
 
                 *result = copy_res;
-                s21_set_exp(result, s21_get_exp_dec(result) + 1);
-
                 s21_binary_div(res_mod, value_2, &partial_res);
                 s21_mod(res_mod, value_2, &res_mod);
                 if (s21_is_equal(res_mod, nuller)) {
-                    s21_set_exp(&partial_res, s21_get_exp_dec(result));
                     s21_add(*result, partial_res, result);
                     break;
                 } else {
-                    s21_set_exp(&partial_res, s21_get_exp_dec(result));
                     s21_add(*result, partial_res, result);
                     s21_mul(res_mod, ten, &res_mod);
                 }
+                counter++;
             }
+            s21_set_exp(result, counter);
         }
 
         if ((singV1 == 1 && singV2 == 0) || (singV1 == 0 && singV2 == 1)) {
@@ -148,7 +164,6 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
         *result = nuller;
         s21_set_bit(result, 127, 0);
     }
-
     return res;
 }
 
