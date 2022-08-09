@@ -62,7 +62,7 @@ int s21_from_float_to_decimal(float f, s21_decimal *dst) {
     }
     int exp = 0;
     for (int i = 0; i < 6; i++, counter++) {
-        if (counter == 28) {
+        if (counter == 29 || f * 10.0 > 79228162514264337593543950335.0) {
             break;
         }
         exp = i + 1;
@@ -72,7 +72,7 @@ int s21_from_float_to_decimal(float f, s21_decimal *dst) {
 
     double part_del;
     int j = 0;
-    while (lf >= 1) {
+    while (lf >= 1 && j < 96) {
         part_del = lf / 2;
         double i;
         double f;
@@ -94,20 +94,20 @@ int s21_from_float_to_decimal(float f, s21_decimal *dst) {
 int s21_from_decimal_to_float(s21_decimal src, float *dst) {
     if (s21_check_decimal(src))
         return 1;
+
     *dst = 0;
-    double result = 0, two = 1;
-    for (int i = 0; i < 96; i++) {
-        if (s21_get_bit(&src, i)) {
-            result += two;
-        }
-        two *= 2.0;
-    }
-    result = round(result);
-    for (int i = 0; i < s21_get_exp_dec(&src); i++) {
-        result /= 10.0;
-    }
-    if (s21_get_sing(&src))
-        result = -result;
-    *dst = result;
+    int exp = s21_get_exp_dec(&src);
+    long double ldst = 0.0;
+
+    for (int i = 0; i < 96; i++)
+        ldst += pow(2.0, i) * s21_get_bit(&src, i);
+
+    while (exp--)
+        ldst /= 10.0;
+
+    if (s21_get_bit(&src, 127))
+        ldst = -ldst;
+
+    *dst = ldst;
     return 0;
 }

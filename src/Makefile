@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -Werror -pedantic -std=c11
+# CFLAGS=-Wall -Wextra -Werror -pedantic -std=c11
 CFLAGS_T=--coverage
 RM=rm -rf
 SRC=./decimal_lib/s21_decimal_another.c \

@@ -120,6 +120,8 @@ s21_decimal* s21_decimal_null(s21_decimal *var) {
 int s21_pow_ballance(s21_decimal *a, s21_decimal *b) {
     int an = s21_get_exp_dec(a);
     int bn = s21_get_exp_dec(b);
+        printf("START AN = %d\n", an);
+        printf("START BN = %d\n", bn);
     s21_decimal ten;
     s21_from_int_to_decimal(10, &ten);
     s21_decimal copy_b = *b;
@@ -129,9 +131,11 @@ int s21_pow_ballance(s21_decimal *a, s21_decimal *b) {
         }
         bn++;
         *b = copy_b;
+        printf("BN = %d\n", bn);
     }
     if (bn != an) {
         while (an != bn) {
+            printf("AN = %d\n", an);
             s21_bank_round(a);
             an--;
         }
@@ -202,6 +206,12 @@ void s21_bank_round(s21_decimal *dst) {
 
     if (s21_is_greater_or_equal(last_num, five)) {
         ten.bits[0] = 1;
-        s21_binary_add(*dst, ten, dst);
+        if (s21_is_equal(last_num, five)) {
+            if (s21_get_bit(dst, 0)) {
+                s21_binary_add(*dst, ten, dst);
+            }
+        } else {
+            s21_binary_add(*dst, ten, dst);
+        }
     }
 }

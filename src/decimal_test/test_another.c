@@ -93,6 +93,35 @@ START_TEST(trunc3) {
 }
 END_TEST
 
+START_TEST(trunc4) {
+    // s21_decimal a;
+    // s21_decimal res;
+    // s21_decimal_null(&a);
+    // s21_set_bit(&a, 1, 1);
+    // s21_set_bit(&a, 3, 1);
+    // s21_set_bit(&a, 14, 1);
+    // s21_set_bit(&a, 5, 1);
+    // s21_set_bit(&a, 8, 1);
+    // s21_set_bit(&a, 9, 1);
+    // s21_set_bit(&a, 32, 1);
+    // s21_set_bit(&a, 62, 1);
+    // s21_set_bit(&a, 49, 1);
+    // s21_set_bit(&a, 44, 1);
+    // // s21_set_bit(&a, 95, 1);
+    // s21_set_bit(&a, 90, 1);
+    // s21_set_bit(&a, 89, 1);
+    // s21_set_exp(&a, 5);
+    // s21_truncate(a, &res);
+    // printf("======================\n");
+    // s21_print_binary_decimal(a, 128);
+    // s21_print_binary_decimal(res, 128);
+    // printf("======================\n");
+    // 1856910063540336977210524458
+    // 18569100635403369772105
+    // 1856910063540
+}
+END_TEST
+
 START_TEST(round1) {
     s21_decimal a;
     s21_decimal res;
@@ -119,7 +148,7 @@ START_TEST(round3) {
     s21_decimal a;
     s21_decimal res;
     float f;
-    for (float i = 1.123F; i < 9.0F; i += 0.92234F) {
+    for (float i = -31231.123F; i < 134763.0F; i += 412.92234F) {
         s21_from_float_to_decimal(i, &a);
         s21_round(a, &res);
         s21_from_decimal_to_float(res, &f);
@@ -135,7 +164,7 @@ START_TEST(floor1) {
     s21_decimal a;
     s21_decimal res;
     float f;
-    for (float i = 1.123F; i < 99.0F; i += 0.92234F) {
+    for (float i = -41231.123; i < 21334.0; i += 1141.92234) {
         s21_from_float_to_decimal(i, &a);
         s21_floor(a, &res);
         s21_from_decimal_to_float(res, &f);
@@ -156,6 +185,7 @@ Suite* s21_test_another(void) {
     tcase_add_test(test_another, trunc1);
     tcase_add_test(test_another, trunc2);
     tcase_add_test(test_another, trunc3);
+    tcase_add_test(test_another, trunc4);
     tcase_add_test(test_another, s21_negate_2);
     tcase_add_test(test_another, s21_negate_3);
     suite_add_tcase(s, test_another);

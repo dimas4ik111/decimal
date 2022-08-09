@@ -19,6 +19,7 @@ int main() {
 
     test_convert = srunner_create(s1);
     test_compare = srunner_create(s2);
+    
     test_help = srunner_create(s3);
     test_another = srunner_create(s4);
     test_arithm = srunner_create(s5);
@@ -29,10 +30,10 @@ int main() {
     srunner_set_fork_status(test_another, CK_NOFORK);
     srunner_set_fork_status(test_arithm, CK_NOFORK);
 
-    srunner_run_all(test_convert, CK_NORMAL);
-    srunner_run_all(test_compare, CK_NORMAL);
-    srunner_run_all(test_another, CK_NORMAL);
-    srunner_run_all(test_arithm, CK_NORMAL);
+    // srunner_run_all(test_convert, CK_NORMAL);
+    // srunner_run_all(test_compare, CK_NORMAL);
+    // srunner_run_all(test_another, CK_NORMAL);
+    // srunner_run_all(test_arithm, CK_NORMAL);
     srunner_run_all(test_help, CK_NORMAL);
 
     no_failed += srunner_ntests_failed(test_convert);

@@ -304,12 +304,12 @@ Suite *s21_test_decimal_convert(void) {
     tcase_add_test(convert_a_case, s21_from_float_to_decimal_1);
     tcase_add_test(convert_a_case, s21_from_float_to_decimal_2);
     tcase_add_test(convert_a_case, s21_from_float_to_decimal_3);
-    // tcase_add_test(convert_a_case, s21_from_float_to_decimal_4);
-    // tcase_add_test(convert_a_case, s21_from_float_to_decimal_5);
-    // tcase_add_test(convert_a_case, s21_from_float_to_decimal_6);
-    // tcase_add_test(convert_a_case, s21_from_float_to_decimal_7);
+    tcase_add_test(convert_a_case, s21_from_float_to_decimal_4);
+    tcase_add_test(convert_a_case, s21_from_float_to_decimal_5);
+    tcase_add_test(convert_a_case, s21_from_float_to_decimal_6);
+    tcase_add_test(convert_a_case, s21_from_float_to_decimal_7);
     tcase_add_test(convert_a_case, s21_from_float_to_decimal_8);
-    // tcase_add_test(convert_a_case, s21_from_float_to_decimal_9);
+    tcase_add_test(convert_a_case, s21_from_float_to_decimal_9);
     suite_add_tcase(s, convert_a_case);
 
     convert_a_case = tcase_create("--DECIMAL TO FLOAT--");
