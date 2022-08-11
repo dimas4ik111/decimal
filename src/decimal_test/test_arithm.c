@@ -654,78 +654,167 @@ START_TEST(s21_mod4) {
 }
 END_TEST
 
-START_TEST(s21_multi_add) {
+START_TEST(mul_inf1) {
     s21_decimal a;
     s21_decimal b;
     s21_decimal res;
-    float f;
-    char buf1[256] = {'\0'};
-    char buf2[256] = {'\0'};
-
-    for (float i = 50.3F; i <= 200.0F; i += 50.0F) {
-        for (float j = -1234.5F; j <= 1234.5F; j += 0.25F) {
-            if (i == 0.0F || j == 0.0F) {
-                i++; j++;
-            }
-            s21_from_float_to_decimal(i, &a);
-            s21_from_float_to_decimal(j, &b);
-            s21_add(a, b, &res);
-            s21_from_decimal_to_float(res, &f);
-            sprintf(buf1, "%f", i + j);
-            sprintf(buf2, "%f", f);
-            printf("i = %f\tj = %f\n", i, j);
-            printf("i / j = %s\n", buf1);
-            printf(" my f = %s\n\n", buf2);
-            ck_assert_str_eq(buf1, buf2);
-        }
-    }
+    a.bits[0] = 0b01100001001001001000000110111000;
+    a.bits[1] = 0b00000000000000000010111000011101;
+    a.bits[2] = 0b00000000000000000000000000000000;
+    a.bits[3] = 0b00000000000000000000000000000000;
+    b.bits[0] = 0b11101111011111100001010111101100;
+    b.bits[1] = 0b11011010101100110101000001011110;
+    b.bits[2] = 0b00000000001001001110011100110111;
+    b.bits[3] = 0b00000000000000000000000000000000;
+    ck_assert_int_eq(s21_mul(a, b, &res), 1);
 }
 END_TEST
 
-// START_TEST(s21_multi_mul) {
-//     s21_decimal a;
-//     s21_decimal b;
-//     s21_decimal res;
-//     float f;
-//     for (float i = 50.55; i <= 200.0; i += 50.0) {
-//         for (float j = -99999.99999; j <= 99999.99999; j += 9999) {
-//             if (i == 0.0F || j == 0.0) {
-//                 i++; j++;
-//             }
-//             s21_from_float_to_decimal(i, &a);
-//             s21_from_float_to_decimal(j, &b);
-//             s21_mul(a, b, &res);
-//             s21_from_decimal_to_float(res, &f);
-//             ck_assert_float_eq(f, i * j);
-//         }
-//     }
-// }
-// END_TEST
+START_TEST(mul_inf2) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    a.bits[0] = 0b11101011011000100100110100001011;
+    a.bits[1] = 0b11001110110111101010100000001111;
+    a.bits[2] = 0b00001001101010111011001111100001;
+    a.bits[3] = 0b10000000000000000000000000000000;
+    b.bits[0] = 0b11000101101111011101001101001110;
+    b.bits[1] = 0b00000000000001111111111001111000;
+    b.bits[2] = 0b00000000000000000000000000000000;
+    b.bits[3] = 0b00000000000000000000000000000000;
+    ck_assert_int_eq(s21_mul(a, b, &res), 2);
+}
+END_TEST
 
-// START_TEST(s21_multi_div) {
-//     s21_decimal a;
-//     s21_decimal b;
-//     s21_decimal res;
-//     char buf1[256] = {'\0'};
-//     char buf2[256] = {'\0'};
-//     float f;
-//     for (float i = 50.55F; i <= 200.0F; i += 50.0F) {
-//         for (float j = -99999.99999F; j <= 99999.99999F; j += 1234.25F) {
-//             if (i == 0.0F || j == 0.0) {
-//                 i++; j++;
-//             }
-//             s21_from_float_to_decimal(i, &a);
-//             s21_from_float_to_decimal(j, &b);
-//             s21_div(a, b, &res);
-//             s21_from_decimal_to_float(res, &f);
-//             sprintf(buf1, "%f", i / j);
-//             sprintf(buf2, "%f", f);
-//             // printf("my fun %f / %f = %s\n", i, j, buf2);
-//             // printf("RESULT %f / %f = %s\n\n", i, j, buf1);
-//             ck_assert_str_eq(buf1, buf2);
-//         }
-//     }
-// }
+START_TEST(float_add1) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    a.bits[0] = 0b00001111110101001100001101011100;
+    a.bits[1] = 0b10000110011101010001111011111101;
+    a.bits[2] = 0b100011111110000011;
+    a.bits[3] = 0;
+    s21_set_exp(&a, 10);
+    b.bits[0] = 0b01100101111000111111010010010011;
+    b.bits[1] = 0b11011010011000000100000001100101;
+    b.bits[2] = 0b110100010;
+    b.bits[3] = 0;
+    s21_set_exp(&b, 10);
+    float f = 0.0;
+    s21_add(a, b, &res);
+    s21_from_decimal_to_float(res, &f);
+    ck_assert_float_eq(272551341447866.041819F, f);
+}
+END_TEST
+
+START_TEST(float_add2) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    a.bits[0] = 0b10000001001001101001011101110010;
+    a.bits[1] = 0;
+    a.bits[2] = 0;
+    a.bits[3] = 0;
+    s21_set_exp(&a, 13);
+    b.bits[0] = 0b11001010001100010101111001110000;
+    b.bits[1] = 0b11011000110101001000111110001000;
+    b.bits[2] = 0b11101010001000;
+    b.bits[3] = 0;
+    s21_set_exp(&b, 7);
+    float f = 0.0;
+    s21_add(a, b, &res);
+    s21_from_decimal_to_float(res, &f);
+    ck_assert_float_eq(27642163747128884.706400F, f);
+}
+END_TEST
+
+START_TEST(float_add3) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    a.bits[0] = 0b00001010000111000000000100011101;
+    a.bits[1] = 0b00001010000111000000000100011101;
+    a.bits[2] = 0b11001101000100110110100;
+    a.bits[3] = 0;
+    s21_sing_dec(&a);
+    s21_set_exp(&a, 6);
+    b.bits[0] = 0b10001011111110001001111101100011;
+    b.bits[1] = 0b1011100010010000010000100;
+    b.bits[2] = 0;
+    b.bits[3] = 0;
+    s21_set_exp(&b, 9);
+    float f = 0.0;
+    s21_add(a, b, &res);
+    s21_from_decimal_to_float(res, &f);
+    ck_assert_float_eq(-123960718951133149053.000000F, f);
+}
+END_TEST
+
+START_TEST(float_add4) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    float f = 0.0;
+    a.bits[0] = 0b01000000111111011001100011100010;
+    a.bits[1] = 0b01010110111001000111111010111100;
+    a.bits[2] = 0b00000001101101011001011001110101;
+    a.bits[3] = 0b10000000000001110000000000000000;
+
+    b.bits[0] = 0b00010101010110101111011110110100;
+    b.bits[1] = 0b01100011101000111000010111111100;
+    b.bits[2] = 0b00000000000000000000100011001010;
+    b.bits[3] = 0b00000000000001100000000000000000;
+
+    s21_add(a, b, &res);
+    s21_from_decimal_to_float(res, &f);
+    ck_assert_float_eq(-5.2859598456878E19F, f);
+}
+END_TEST
+
+START_TEST(float_sub1) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    float f = 0.0;
+    a.bits[0] = 0b01100110000100011101000111100101;
+    a.bits[1] = 0b110100000110101011;
+    a.bits[2] = 0;
+    a.bits[3] = 0;
+    s21_set_exp(&a, 11);
+
+    b.bits[0] = 0b100000011011000010001010100;
+    b.bits[1] = 0;
+    b.bits[2] = 0;
+    b.bits[3] = 0;
+    s21_set_exp(&b, 9);
+
+    s21_sub(a, b, &res);
+    s21_from_decimal_to_float(res, &f);
+    ck_assert_float_eq(9166.225383F, f);
+}
+END_TEST
+
+START_TEST(float_sub2) {
+    s21_decimal a;
+    s21_decimal b;
+    s21_decimal res;
+    float f = 0.0;
+    a.bits[0] = 0b11110010100001000111110100110110;
+    a.bits[1] = 0b110100110110111;
+    a.bits[2] = 0;
+    a.bits[3] = 0b10000000000000000000000000000000;
+
+    b.bits[0] = 0b01000110100000000001001110011011;
+    b.bits[1] = 0b11000001011101011010;
+    b.bits[2] = 0;
+    b.bits[3] = 0b10000000000000000000000000000000;
+    s21_set_exp(&b, 14);
+
+    s21_sub(a, b, &res);
+    s21_from_decimal_to_float(res, &f);
+    ck_assert_float_eq(-116238768700691.966238F, f);
+}
+END_TEST
 
 Suite* s21_test_arithm(void) {
     Suite *s = suite_create("!!!!ARITHM!!!!!");
@@ -744,6 +833,10 @@ Suite* s21_test_arithm(void) {
     tcase_add_test(arithm_a_test, s21_add9);
     tcase_add_test(arithm_a_test, s21_add10);
     tcase_add_test(arithm_a_test, s21_add11);
+    tcase_add_test(arithm_a_test, float_add1);
+    tcase_add_test(arithm_a_test, float_add2);
+    tcase_add_test(arithm_a_test, float_add3);
+    tcase_add_test(arithm_a_test, float_add4);
     suite_add_tcase(s, arithm_a_test);
 
     arithm_a_test = tcase_create("--SUB--");
@@ -757,6 +850,8 @@ Suite* s21_test_arithm(void) {
     tcase_add_test(arithm_a_test, s21_sub8);
     tcase_add_test(arithm_a_test, s21_sub9);
     tcase_add_test(arithm_a_test, s21_sub10);
+    tcase_add_test(arithm_a_test, float_sub1);
+    tcase_add_test(arithm_a_test, float_sub2);
     suite_add_tcase(s, arithm_a_test);
 
     arithm_a_test = tcase_create("--MUL--");
@@ -770,6 +865,8 @@ Suite* s21_test_arithm(void) {
     tcase_add_test(arithm_a_test, s21_mul8);
     tcase_add_test(arithm_a_test, s21_mul9);
     tcase_add_test(arithm_a_test, s21_mul10);
+    tcase_add_test(arithm_a_test, mul_inf1);
+    tcase_add_test(arithm_a_test, mul_inf2);
     suite_add_tcase(s, arithm_a_test);
 
     arithm_a_test = tcase_create("--DIV--");
@@ -791,12 +888,6 @@ Suite* s21_test_arithm(void) {
     tcase_add_test(arithm_a_test, s21_mod2);
     tcase_add_test(arithm_a_test, s21_mod3);
     tcase_add_test(arithm_a_test, s21_mod4);
-    suite_add_tcase(s, arithm_a_test);
-
-    arithm_a_test = tcase_create("--MULTI_TEST__");
-    // tcase_add_test(arithm_a_test, s21_multi_add);
-    // tcase_add_test(arithm_a_test, s21_multi_mul);
-    // tcase_add_test(arithm_a_test, s21_multi_div);
     suite_add_tcase(s, arithm_a_test);
 
     return s;

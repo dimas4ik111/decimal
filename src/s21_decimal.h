@@ -71,7 +71,7 @@ s21_decimal* s21_reverse_dec(s21_decimal src, s21_decimal *res);
 int s21_Lshift(s21_decimal* src);
 int s21_mini_cicle_ballance(s21_decimal *var, s21_decimal ten, int n, int *flag);
 int s21_Rshift(s21_decimal* src);
-int s21_from_float_to_decimal_help(float src, s21_decimal *dst);
 void s21_bank_round(s21_decimal *dst);
+int s21_stupid_pow(s21_decimal *a, s21_decimal *b);
 
 #endif  // SRC_S21_DECIMAL_H_

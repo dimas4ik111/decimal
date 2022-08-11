@@ -34,12 +34,7 @@ test : $(LIB) $(OBJ_TEST)
 gcov_report: $(LIB) $(OBJ_TEST) s21_decimal_another_t.o s21_decimal_arithm_t.o s21_decimal_compar_t.o s21_decimal_convert_t.o s21_decimal_help_t.o
 	@$(CC) $(CFLAGS) $(OBJ_REP_DIR)*.o $(LIB) $(OBJ_TEST) -lcheck -lgcov -o s21_tests_decimal.out
 	@./s21_tests_decimal.out
-	@echo
-	# @echo -------------------| COVERAGE |-------------------
-	@echo
 	@gcov -a -b ./report_obj/*.gcda
-	# @echo -----------------| END COVERAGE |-----------------
-	@echo
 	@gcovr --html-details coverage.html
 
 s21_decimal_another_t.o : ./decimal_lib/s21_decimal_another.c

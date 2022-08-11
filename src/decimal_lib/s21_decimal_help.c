@@ -33,17 +33,16 @@ void s21_set_bit(s21_decimal *var, int bit, int val) {
 }
 
 void s21_set_exp(s21_decimal *var, int ten) {
+    int help_var = s21_get_bit(var, 127);
+    var->bits[3] = 0;
+    s21_set_bit(var, 127, help_var);
     if (ten == 0) {
-        for (int i = 96 + 15; i <= 96 + 23; i++) {
+        for (int i = 96 + 16; i <= 96 + 23; i++) {
             s21_set_bit(var, i, 0);
         }
     } else {
-        for (int i = 96 + 15; i <= 96 + 23; i++) {
-            if (ten == 0) {
-                break;
-            } else {
+        for (int i = 96 + 16; i <= 96 + 23; i++) {
                 s21_set_bit(var, i, (ten % 2));
-            }
             ten /= 2;
         }
     }
@@ -55,9 +54,9 @@ void s21_print_binary_decimal(s21_decimal var, int n) {
         int bit = s21_get_bit(&var, i);
         if (i == 127) {
             printf("%s%u%s", GREEN, bit, RESET);
-        } else if (i < 127 - 8 && i >= 127 - 16) {
+        } else if (i <= 96 + 23 && i >= 96 + 16) {
             printf("%s%u%s", GREEN, bit, RESET);
-        } else if ((i < 127 && i >= 127 - 8) || (i < 127 - 16 && i > 95)) {
+        } else if ((i > 95 && i < 96 + 23) || (i > 96 + 23 && i < 127)) {
             printf("%s%u%s", RED, bit, RESET);
         } else {
             if (bit == 1) {
@@ -73,29 +72,29 @@ void s21_print_binary_decimal(s21_decimal var, int n) {
     printf("\n");
 }
 
-void s21_print_exp_bit(s21_decimal *var) {
-    printf("\nEXP = ");
-    for (int i = 96 + 23; i >= 96 + 15; i--) {
-        printf("%s%d%s", GREEN, s21_get_bit(var, i), RESET);
-    }
-    printf("\n");
-}
+// void s21_print_exp_bit(s21_decimal *var) {
+//     printf("\nEXP = ");
+//     for (int i = 96 + 23; i >= 96 + 16; i--) {
+//         printf("%s%d%s", GREEN, s21_get_bit(var, i), RESET);
+//     }
+//     printf("\n");
+// }
 
 int s21_get_exp_dec(s21_decimal *var) {
     int res = 0;
-    int doubleMas[9];
-    int n = 8;
-    for (int i = 127 - 8; i >= 96 + 15; i--) {
+    int mas[8] = {0};
+    int n = 7;
+    for (int i = 96 + 23; i >= 96 + 16; i--) {
         if (s21_get_bit(var, i)) {
-            doubleMas[n] = 1;
+            mas[n] = 1;
         } else {
-            doubleMas[n] = 0;
+            mas[n] = 0;
         }
         n--;
     }
     int step = 0;
-    for (int i = 0; i < 9; i++) {
-        res += doubleMas[i] * (int)pow(2, step);
+    for (int i = 0; i < 8; i++) {
+        res += mas[i] * (int)pow(2, step);
         step++;
     }
     return res;
@@ -117,32 +116,46 @@ s21_decimal* s21_decimal_null(s21_decimal *var) {
     return var;
 }
 
-int s21_pow_ballance(s21_decimal *a, s21_decimal *b) {
-    int an = s21_get_exp_dec(a);
-    int bn = s21_get_exp_dec(b);
-        printf("START AN = %d\n", an);
-        printf("START BN = %d\n", bn);
+int s21_pow_ballance(s21_decimal *a, s21_decimal *b) {  // exp_a always higher then exp_b
+    int exp_a = s21_get_exp_dec(a);
+    int exp_b = s21_get_exp_dec(b);
+    int sing1 = s21_get_bit(a, 127);
+    int sing2 = s21_get_bit(b, 127);
+    if (exp_a == exp_b)  // ERROR for this function
+        return exp_a;
+    
+    if (exp_a > exp_b) {
+        exp_a = s21_stupid_pow(a, b);
+    } else if (exp_a < exp_b) {
+        exp_a = s21_stupid_pow(b, a);
+    }
+    s21_set_bit(a, 127, sing1);
+    s21_set_bit(b, 127, sing2);
+
+    return exp_a;
+}
+
+int s21_stupid_pow(s21_decimal *a, s21_decimal *b) {
+    int exp_a = s21_get_exp_dec(a);
+    int exp_b = s21_get_exp_dec(b);
     s21_decimal ten;
-    s21_from_int_to_decimal(10, &ten);
-    s21_decimal copy_b = *b;
-    for (int i = bn; i < an; i++) {
-        if (s21_binary_mul(copy_b, ten, &copy_b) > 0) {
+    s21_decimal_null(&ten);
+    ten.bits[0] = 10;
+    while (exp_b != exp_a) {
+        s21_decimal copy_b = *b;
+        if (s21_binary_mul(copy_b, ten, &copy_b)) {
             break;
         }
-        bn++;
         *b = copy_b;
-        printf("BN = %d\n", bn);
+        exp_b++;
     }
-    if (bn != an) {
-        while (an != bn) {
-            printf("AN = %d\n", an);
-            s21_bank_round(a);
-            an--;
-        }
+    while (exp_a != exp_b) {
+        s21_bank_round(a);
+        exp_a--;
     }
-    s21_set_exp(a, bn);
-    s21_set_exp(b, bn);
-    return bn;
+    s21_set_exp(a, exp_a);
+    s21_set_exp(b, exp_a);
+    return exp_a;
 }
 
 int s21_Lshift(s21_decimal* src) {
@@ -196,7 +209,7 @@ void s21_bank_round(s21_decimal *dst) {
     s21_binary_mul(copy_of_dst, ten, &copy_of_dst);
 
     s21_decimal last_num;
-    s21_sub(*dst, copy_of_dst, &last_num);
+    s21_binary_sub(*dst, copy_of_dst, &last_num);
 
     s21_decimal five;
     s21_from_int_to_decimal(5, &five);

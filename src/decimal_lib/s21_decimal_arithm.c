@@ -7,22 +7,26 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     int res = 0, singV1 = s21_get_sing(&value_1), singV2 = s21_get_sing(&value_2);
     int exp1 = s21_get_exp_dec(&value_1);
     int exp2 = s21_get_exp_dec(&value_2);
-    if (exp1 > exp2) {
-        s21_set_exp(result, s21_pow_ballance(&value_1, &value_2));
-    } else if (exp1 < exp2) {
-        s21_set_exp(result, s21_pow_ballance(&value_2, &value_1));
-    }
-    if (singV1 < singV2) {
+
+    s21_set_exp(result, s21_pow_ballance(&value_1, &value_2));
+
+    if (singV1 == singV2) {
+        res = s21_binary_add(value_1, value_2, result);
+        if (singV1 && singV2) {
+            s21_sing_dec(result);
+        }
+    } else if (singV1 == 0 && singV2 == 1) {
         s21_set_bit(&value_2, 127, 0);
         res = s21_sub(value_1, value_2, result);
-    } else if (singV1 == singV2) {
-        res = s21_binary_add(value_1, value_2, result);
-        if (singV1 + singV2 == 2)
-            s21_sing_dec(result);
-    } else if (singV1 > singV2) {
+    } else if (singV1 == 1 && singV2 == 0) {
         s21_set_bit(&value_1, 127, 0);
         res = s21_sub(value_2, value_1, result);
     }
+
+    if (res) {
+        s21_decimal_null(result);
+    }
+
     return res;
 }
 
@@ -32,12 +36,8 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     int exp1 = s21_get_exp_dec(&value_1);
     int exp2 = s21_get_exp_dec(&value_2);
 
-    if (exp1 > exp2) {
-        s21_set_exp(result, s21_pow_ballance(&value_1, &value_2));
-    } else if (exp1 < exp2) {
-        s21_set_exp(result, s21_pow_ballance(&value_2, &value_1));
-    }
-
+    s21_set_exp(result, s21_pow_ballance(&value_1, &value_2));
+    
     if (singV1 + singV2 == 0) {
         if (s21_is_greater_or_equal(value_1, value_2)) {
             res = s21_binary_sub(value_1, value_2, result);
@@ -46,26 +46,21 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
             s21_sing_dec(result);
         }
     } else if (singV1 > singV2) {
-        s21_binary_add(value_1, value_2, result);
+        res = s21_binary_add(value_1, value_2, result);
         s21_sing_dec(result);
     } else if (singV1 + singV2 == 2) {
-        s21_set_bit(&value_1, 127, 0);
         s21_set_bit(&value_2, 127, 0);
-        res = s21_sub(value_2, value_1, result);
+        s21_add(value_1, value_2, result);
     } else if (singV1 < singV2) {
         s21_set_bit(&value_2, 127, 0);
         res = s21_binary_add(value_1, value_2, result);
-    }
-
-    if (exp1 == exp2) {
-        s21_set_exp(result, exp1);
     }
     return res;
 }
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     s21_decimal_null(result);
-    int res = 1, singV1 = s21_get_sing(&value_1), singV2 = s21_get_sing(&value_2);
+    int res = 0, singV1 = s21_get_sing(&value_1), singV2 = s21_get_sing(&value_2);
     int exp1 = 0;
     int exp2 = 0;
     exp1 = s21_get_exp_dec(&value_1);
@@ -99,6 +94,8 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 
     if (res) {
         s21_decimal_null(result);
+        if ((singV1 && !singV2) || (!singV1 && singV2))
+            res++;
     } else {
         s21_set_exp(result, exp1 + exp2);
     }
@@ -121,11 +118,7 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 
     int sum_exp = 0;
 
-    if (exp1 > exp2) {
-        sum_exp = s21_pow_ballance(&value_1, &value_2);
-    } else if (exp1 < exp2) {
-        sum_exp = s21_pow_ballance(&value_2, &value_1);
-    }
+    s21_pow_ballance(&value_1, &value_2);
 
     value_1.bits[3] = 0;
     value_2.bits[3] = 0;
@@ -133,7 +126,6 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
         res = s21_binary_div(value_1, value_2, result);
         float aboba;
         s21_from_decimal_to_float(*result, &aboba);
-        printf("\nABOBA = %f\n\n", aboba);
         s21_decimal res_mod;
         s21_decimal partial_res;
         s21_mod(value_1, value_2, &res_mod);
@@ -162,13 +154,9 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
                     s21_mul(res_mod, ten, &res_mod);
                     counter++;
                 }
-                printf("COUNTER = %d\n", counter);
             }
             s21_set_exp(result, counter);
         }
-        //  else {
-        //     s21_set_exp(result, sum_exp);
-        // }
 
         if ((singV1 == 1 && singV2 == 0) || (singV1 == 0 && singV2 == 1)) {
             s21_sing_dec(result);
@@ -190,17 +178,19 @@ int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     int res = 0;
     int exp1 = s21_get_exp_dec(&value_1);
     int exp2 = s21_get_exp_dec(&value_2);
-    if (exp1 > exp2) {
-        s21_set_exp(result, s21_pow_ballance(&value_1, &value_2));
-    } else if (exp1 < exp2) {
-        s21_set_exp(result, s21_pow_ballance(&value_2, &value_1));
-    }
+    int exp_res = s21_pow_ballance(&value_1, &value_2);
+    int sing = s21_get_bit(&value_1, 127);
+    s21_set_bit(&value_1, 127, 0);
+    s21_set_bit(&value_2, 127, 0);
 
     s21_decimal help_struct;
     s21_decimal_null(result);
     s21_binary_div(value_1, value_2, &help_struct);
     s21_mul(help_struct, value_2, &help_struct);
     s21_sub(value_1, help_struct, result);
+    s21_set_exp(result, exp_res);
+    if (sing)
+        s21_sing_dec(result);
     return res;
 }
 
@@ -319,7 +309,7 @@ int s21_binary_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result
             }
             helpStruct = value_1;
             for (int j = 0; j < i; j++) {
-                s21_Lshift(&helpStruct);
+                res = s21_Lshift(&helpStruct);
             }
             res = s21_binary_add(*result, helpStruct, result);
         }
