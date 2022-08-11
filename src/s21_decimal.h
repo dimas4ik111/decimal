@@ -7,7 +7,7 @@
 #include <limits.h>
 #include <stdlib.h>
 
-//comparison
+// comparison
 #define TRUE 1
 #define FALSE 0
 
@@ -24,7 +24,7 @@
 #define MAGENTA "\033[35m"
 
 typedef struct {
-    unsigned int bits[4]; 
+    unsigned int bits[4];
 } s21_decimal;
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
@@ -57,7 +57,6 @@ void s21_set_exp(s21_decimal *var, int ten);
 void s21_print_binary_decimal(s21_decimal var, int n);
 void s21_print_exp_bit(s21_decimal *var);
 void s21_sing_dec(s21_decimal *var);
-void s21_print_reverse_decimal(s21_decimal var, int n, int exp);
 int s21_get_exp_dec(s21_decimal *var);
 s21_decimal* s21_decimal_null(s21_decimal *var);
 int s21_get_sing(s21_decimal *var);
@@ -67,9 +66,7 @@ int s21_check_decimal(s21_decimal dst);
 int s21_pow_ballance(s21_decimal* a, s21_decimal* b);
 int s21_binary_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_binary_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
-s21_decimal* s21_reverse_dec(s21_decimal src, s21_decimal *res);
 int s21_Lshift(s21_decimal* src);
-int s21_mini_cicle_ballance(s21_decimal *var, s21_decimal ten, int n, int *flag);
 int s21_Rshift(s21_decimal* src);
 void s21_bank_round(s21_decimal *dst);
 int s21_stupid_pow(s21_decimal *a, s21_decimal *b);

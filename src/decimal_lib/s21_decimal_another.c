@@ -1,9 +1,4 @@
-// Другие функции из задания
 #include "../s21_decimal.h"
-
-/* Другие функции */
-// 0 - OK
-// 1 - ошибка вычисления
 
 int s21_floor(s21_decimal value, s21_decimal *result) {
     if (s21_check_decimal(value))
@@ -61,7 +56,7 @@ int s21_round(s21_decimal value, s21_decimal *result) {
         s21_from_int_to_decimal(-1, &help_str);
         s21_add(trunc_val, help_str, &trunc_val);
         *result = trunc_val;
-        
+
     } else {
         *result = trunc_val;
     }

@@ -19,7 +19,7 @@ int main() {
 
     test_convert = srunner_create(s1);
     test_compare = srunner_create(s2);
-    
+
     test_help = srunner_create(s3);
     test_another = srunner_create(s4);
     test_arithm = srunner_create(s5);

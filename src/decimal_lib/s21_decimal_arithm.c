@@ -5,8 +5,8 @@ void s21_sub_cicle();
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     s21_decimal_null(result);
     int res = 0, singV1 = s21_get_sing(&value_1), singV2 = s21_get_sing(&value_2);
-    int exp1 = s21_get_exp_dec(&value_1);
-    int exp2 = s21_get_exp_dec(&value_2);
+    s21_get_exp_dec(&value_1);
+    s21_get_exp_dec(&value_2);
 
     s21_set_exp(result, s21_pow_ballance(&value_1, &value_2));
 
@@ -33,11 +33,11 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     s21_decimal_null(result);
     int res = 0, singV1 = s21_get_sing(&value_1), singV2 = s21_get_sing(&value_2);
-    int exp1 = s21_get_exp_dec(&value_1);
-    int exp2 = s21_get_exp_dec(&value_2);
+    s21_get_exp_dec(&value_1);
+    s21_get_exp_dec(&value_2);
 
     s21_set_exp(result, s21_pow_ballance(&value_1, &value_2));
-    
+
     if (singV1 + singV2 == 0) {
         if (s21_is_greater_or_equal(value_1, value_2)) {
             res = s21_binary_sub(value_1, value_2, result);
@@ -107,16 +107,13 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     s21_decimal_null(&nuller);
     if (s21_is_equal(value_2, nuller))
         return 3;
-
     s21_decimal_null(result);
     int res = 0, singV1 = s21_get_sing(&value_1), singV2 = s21_get_sing(&value_2);
-    int exp1 = s21_get_exp_dec(&value_1);
-    int exp2 = s21_get_exp_dec(&value_2);
+    s21_get_exp_dec(&value_1);
+    s21_get_exp_dec(&value_2);
 
     s21_decimal ten_num;
     s21_from_int_to_decimal(10, &ten_num);
-
-    int sum_exp = 0;
 
     s21_pow_ballance(&value_1, &value_2);
 
@@ -137,7 +134,7 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
             int counter = 0;
             while (s21_is_not_equal(res_mod, nuller)) {
                 s21_decimal copy_res = *result;
-            
+
                 if (s21_get_exp_dec(result) == 28 || s21_binary_mul(copy_res, ten, &copy_res) > 0) {
                     break;
                 }
@@ -176,8 +173,8 @@ int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
         return 3;
 
     int res = 0;
-    int exp1 = s21_get_exp_dec(&value_1);
-    int exp2 = s21_get_exp_dec(&value_2);
+    s21_get_exp_dec(&value_1);
+    s21_get_exp_dec(&value_2);
     int exp_res = s21_pow_ballance(&value_1, &value_2);
     int sing = s21_get_bit(&value_1, 127);
     s21_set_bit(&value_1, 127, 0);
@@ -241,7 +238,7 @@ int s21_binary_div(s21_decimal a, s21_decimal b, s21_decimal *res) {
         if (i != k)
             s21_Lshift(res);
     }
-    
+
     return answer;
 }
 

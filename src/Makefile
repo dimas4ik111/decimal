@@ -1,5 +1,5 @@
 CC=gcc
-# CFLAGS=-Wall -Wextra -Werror -pedantic -std=c11
+CFLAGS=-Wall -Wextra -Werror -pedantic -std=c11
 CFLAGS_T=--coverage
 RM=rm -rf
 SRC=./decimal_lib/s21_decimal_another.c \
@@ -28,7 +28,7 @@ $(LIB) : $(OBJ) s21_decimal.h
 	ranlib s21_decimal.a
 
 test : $(LIB) $(OBJ_TEST)
-	$(CC) $(CFLAGS) $^ -lcheck -lgcov -o s21_tests_decimal.out
+	$(CC) $^ -lcheck -lgcov -o s21_tests_decimal.out
 	./s21_tests_decimal.out
 
 gcov_report: $(LIB) $(OBJ_TEST) s21_decimal_another_t.o s21_decimal_arithm_t.o s21_decimal_compar_t.o s21_decimal_convert_t.o s21_decimal_help_t.o
@@ -62,7 +62,7 @@ clean:
 rebuild : clean all
 
 # не отображать в консоль команды
-.SILENT: $(OBJ) $(OBJ_TEST) $(OBJ_REPORT) $(LIB) test clean
+# .SILENT: $(OBJ) $(OBJ_TEST) $(OBJ_REPORT) $(LIB) test clean
 
 # фальшивая цель
 .PHONY: all test clean rep

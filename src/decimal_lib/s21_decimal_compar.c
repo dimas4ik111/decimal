@@ -1,8 +1,4 @@
-// Операции сравнения
 #include "../s21_decimal.h"
-
-// 0 - FALSE
-// 1 - TRUE
 
 int s21_is_equal(s21_decimal dec_first, s21_decimal dec_second) {
     int res = TRUE;
@@ -20,8 +16,8 @@ int s21_is_not_equal(s21_decimal dec_first, s21_decimal dec_second) {
 
 int s21_is_greater(s21_decimal dec_first, s21_decimal dec_second) {
     int res = FALSE, singV1 = s21_get_sing(&dec_first), singV2 = s21_get_sing(&dec_second);
-    int exp1 = s21_get_exp_dec(&dec_first);
-    int exp2 = s21_get_exp_dec(&dec_second);
+    s21_get_exp_dec(&dec_first);
+    s21_get_exp_dec(&dec_second);
     s21_pow_ballance(&dec_first, &dec_second);
     if (singV2 < singV1) {
         res = 0;
