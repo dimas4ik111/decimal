@@ -13,6 +13,7 @@ in 127 byte have sing '+' / '-'
     res dec = 1234.5678
 -------------------------------------------------------------
 #MAKEFILE
+
     make s21_decimal.a: create library 
     make test: test for library, in use lib "check.h" last version in MacOS
                                          on Linux they can't work correctly
