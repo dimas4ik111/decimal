@@ -12,6 +12,14 @@ in 127 byte have sing '+' / '-'
     sing: 1 (127 byte == 1)
     res dec = 1234.5678
 -------------------------------------------------------------
+#MAKEFILE
+    make s21_decimal.a: create library 
+    make test: test for library, in use lib "check.h" last version in MacOS
+                                         on Linux they can't work correctly
+    make gcov-report: coverage report with help tests and create html page 
+               (with gcovr) where you can see covarage and also information
+    make clean: delete trust (*.o *.gcda and another)
+-------------------------------------------------------------
 ABOUT FUNC
 
     All function replace in dir library and sort
